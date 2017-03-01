@@ -14,6 +14,14 @@ class From extends EventEmitter {
         msg: '请输入合法邮件地址～'
       }
     })
+
+    this.addValidator('required', (text) => {
+      if (text !== undefined && text !== '') return { success: true }
+      return {
+        success: false,
+        msg: '请输入此字段'
+      }
+    })
   }
   /*
     options
@@ -21,7 +29,6 @@ class From extends EventEmitter {
     validators : ['isString' , 'notEmpty'] ,
   */
   add (text, options) {
-    if (text === undefined) throw new Error('add : text is required!')
     if (options.label === undefined) throw new Error('add : label is required!')
 
     let comfirmObj = {
@@ -82,12 +89,16 @@ class From extends EventEmitter {
         code: code,
         msg: backObj.msg
       }
-      setImmediate(() => {
-        this.emit('validateError', e, backObj.msg)
-      })
+      this.validateError(e, backObj.msg)
       return false
     }
     return true
+  }
+
+  validateError (e, msg) {
+    setImmediate(() => {
+      this.emit('validateError', e, msg)
+    })
   }
 
 }

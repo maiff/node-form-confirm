@@ -43,4 +43,18 @@ describe('form', function () {
       done()
     })
   })
+  it('validate error', function (done) {
+    form.add('', {
+      label: '邮箱',
+      validators: ['required','isEmail'],
+      code: 1
+    })
+
+    form.validate()
+    form.on('validateError', (e, msg) => {
+      console.log(e)
+      assert.equal(e.code, 1)
+      done()
+    })
+  })
 })
