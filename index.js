@@ -57,13 +57,13 @@ class From extends EventEmitter {
   }
 
   validate (fn) {
-    let flag = true
+    let flag = 0
     let comfirmList = this.comfirmList
     let comfirmListLength = comfirmList.length
     for (let i = 0; i < comfirmListLength; i++) {
-      flag = this._validateEvery(comfirmList[i])
+      flag += this._validateEvery(comfirmList[i])
     }
-    flag && fn && fn()
+    flag || fn && fn()
   }
 
   _validateEvery (comfirmObj) {
@@ -72,9 +72,9 @@ class From extends EventEmitter {
     let code = comfirmObj.code
     let needValidateList = comfirmObj.validators
     let needValidateListLength = needValidateList.length
-    let flag = true
+    let flag = 0
     for (let i = 0; i < needValidateListLength; i++) {
-      flag = this._validate(label, text, code, needValidateList[i])
+      flag += this._validate(label, text, code, needValidateList[i])
     }
     return flag
   }
@@ -90,9 +90,9 @@ class From extends EventEmitter {
         msg: backObj.msg
       }
       this.validateError(e, backObj.msg)
-      return false
+      return 1
     }
-    return true
+    return 0
   }
 
   validateError (e, msg) {
