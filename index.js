@@ -3,6 +3,7 @@ const EventEmitter = require('events')
 class From extends EventEmitter {
   constructor () {
     super()
+    this.nowCode = 0
     this.comfirmList = []
     this.validators = {}
     this.addValidator('isEmail', (text) => {
@@ -26,7 +27,8 @@ class From extends EventEmitter {
     let comfirmObj = {
       text: text,
       label: options.label,
-      validators: options.validators || []
+      validators: options.validators || [],
+      code: options.code || this.nowCode++
     }
     this.comfirmList.push(comfirmObj)
 
@@ -60,22 +62,24 @@ class From extends EventEmitter {
   _validateEvery (comfirmObj) {
     let text = comfirmObj.text
     let label = comfirmObj.label
+    let code = comfirmObj.code
     let needValidateList = comfirmObj.validators
     let needValidateListLength = needValidateList.length
     let flag = true
     for (let i = 0; i < needValidateListLength; i++) {
-      flag = this._validate(label, text, needValidateList[i])
+      flag = this._validate(label, text, code, needValidateList[i])
     }
     return flag
   }
 
-  _validate (label, text, name /* string */) {
+  _validate (label, text, code, name /* string */) {
     let validators = this.validators
     let backObj = validators[name](text)
     if (backObj.success === false) {
       let e = {
         label: label,
         text: text,
+        code: code,
         msg: backObj.msg
       }
       setImmediate(() => {
